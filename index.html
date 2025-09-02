@@ -2,13 +2,1392 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CullStore - Top Up Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary: #FFD700;
+            --primary-dark: #FF8C00;
+            --accent: #FF4500;
+            --dark: #121212;
+            --darker: #0A0A0A;
+            --light: #FFFFFF;
+            --gray: #2A2A2A;
+            --light-gray: #404040;
+            --diamond-blue: #00B4D8;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --bg-color: var(--dark);
+            --text-color: var(--light);
+            --card-bg: #1A1A1A;
+            --header-bg: rgba(26, 26, 26, 0.95);
+            --border-color: rgba(255, 215, 0, 0.4);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+        
+        .light-mode {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #3b82f6;
+            --bg-color: #dbeafe;
+            --text-color: #1e3a8a;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(37, 99, 235, 0.4);
+            --gray: #e0e7ff;
+            --light-gray: #c7d2fe;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 14px;
+        }
+        
+        /* Background Elements */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 100px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+        
+        .cloud-1 {
+            width: 100px;
+            height: 35px;
+            top: 15%;
+            left: -120px;
+            animation: moveCloud 30s linear infinite;
+        }
+        
+        .cloud-1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 10px;
+        }
+        
+        .cloud-1::after {
+            width: 35px;
+            height: 35px;
+            top: -12px;
+            right: 10px;
+        }
+        
+        .cloud-2 {
+            width: 120px;
+            height: 40px;
+            top: 35%;
+            right: -150px;
+            animation: moveCloudReverse 35s linear infinite;
+        }
+        
+        .cloud-2::before {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            left: 15px;
+        }
+        
+        .cloud-2::after {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            right: 15px;
+        }
+        
+        .cloud-3 {
+            width: 90px;
+            height: 30px;
+            top: 65%;
+            left: -110px;
+            animation: moveCloud 40s linear infinite;
+        }
+        
+        .cloud-3::before {
+            width: 35px;
+            height: 35px;
+            top: -15px;
+            left: 8px;
+        }
+        
+        .cloud-3::after {
+            width: 30px;
+            height: 30px;
+            top: -12px;
+            right: 8px;
+        }
+        
+        .rainbow {
+            position: absolute;
+            top: 50%;
+            right: -300px;
+            width: 300px;
+            height: 150px;
+            border-radius: 0 150px 150px 0;
+            opacity: 0.7;
+            animation: moveRainbow 60s linear infinite;
+            display: none;
+        }
+        
+        .rainbow-color {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 0 150px 150px 0;
+        }
+        
+        .rainbow-1 { background: rgba(255, 0, 0, 0.3); }
+        .rainbow-2 { background: rgba(255, 165, 0, 0.3); transform: scale(0.9); }
+        .rainbow-3 { background: rgba(255, 255, 0, 0.3); transform: scale(0.8); }
+        .rainbow-4 { background: rgba(0, 128, 0, 0.3); transform: scale(0.7); }
+        .rainbow-5 { background: rgba(0, 0, 255, 0.3); transform: scale(0.6); }
+        .rainbow-6 { background: rgba(75, 0, 130, 0.3); transform: scale(0.5); }
+        .rainbow-7 { background: rgba(238, 130, 238, 0.3); transform: scale(0.4); }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+        
+        .shooting-star {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
+            animation: shoot 10s infinite;
+        }
+        
+        @keyframes moveCloud {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+        
+        @keyframes moveCloudReverse {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(-100vw - 200px)); }
+        }
+        
+        @keyframes moveRainbow {
+            from { right: -300px; }
+            to { right: 100vw; }
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        @keyframes shoot {
+            0% { 
+                opacity: 0;
+                top: -100px;
+                right: -100px;
+                width: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            20% {
+                opacity: 0;
+                top: 300px;
+                right: 1000px;
+                width: 100px;
+            }
+            100% {
+                opacity: 0;
+                top: 300px;
+                right: 1000px;
+                width: 100px;
+            }
+        }
+        
+        .light-mode .cloud {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .light-mode .cloud::before,
+        .light-mode .cloud::after {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .light-mode .rainbow {
+            display: block;
+        }
+        
+        .light-mode .star,
+        .light-mode .shooting-star {
+            display: none;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Alert Modal */
+        .alert-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+        
+        .alert-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .alert-content {
+            background-color: var(--card-bg);
+            border: 4px solid var(--danger);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+        }
+        
+        .alert-icon {
+            font-size: 2.5rem;
+            color: var(--danger);
+            margin-bottom: 15px;
+        }
+        
+        .alert-title {
+            font-size: 1rem;
+            color: var(--danger);
+            margin-bottom: 15px;
+        }
+        
+        .alert-message {
+            font-size: 0.7rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .alert-button {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .alert-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Success Modal */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+        
+        .success-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .success-content {
+            background-color: var(--card-bg);
+            border: 4px solid var(--success);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+        }
+        
+        .success-icon {
+            font-size: 2.5rem;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+        
+        .success-title {
+            font-size: 1rem;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+        
+        .success-message {
+            font-size: 0.7rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .success-button {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .success-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Info Modal */
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+        
+        .info-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .info-content {
+            background-color: var(--card-bg);
+            border: 4px solid var(--info);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+        }
+        
+        .info-icon {
+            font-size: 2.5rem;
+            color: var(--info);
+            margin-bottom: 15px;
+        }
+        
+        .info-title {
+            font-size: 1rem;
+            color: var(--info);
+            margin-bottom: 15px;
+        }
+        
+        .info-message {
+            font-size: 0.7rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-align: left;
+            color: var(--text-color);
+        }
+        
+        .info-button {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .info-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--header-bg);
+            padding: 0 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            border-bottom: 3px solid var(--primary);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover img {
+            transform: scale(1.1);
+        }
+        
+        .logo-text {
+            font-size: 1.2rem;
+            color: var(--primary);
+            letter-spacing: 0px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-item {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .light-mode .nav-item:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .icon-btn:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .light-mode .icon-btn:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Main Content */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 60px auto 0;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 3px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-content:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark), var(--primary));
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin: 15px 0 10px;
+            font-size: 1.1rem;
+        }
+        
+        h3 {
+            color: var(--primary);
+            margin: 10px 0 8px;
+            font-size: 0.9rem;
+        }
+        
+        p {
+            margin-bottom: 12px;
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .game-selection {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 3px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            flex: 1;
+            max-width: 100%;
+            min-width: 140px;
+            box-shadow: var(--shadow);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-logo {
+            height: 50px;
+            margin-bottom: 12px;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+        
+        .game-card:hover .game-logo {
+            transform: scale(1.1);
+        }
+        
+        .game-title {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .game-desc {
+            font-size: 0.6rem;
+            color: var(--text-color);
+        }
+        
+        /* Products Page */
+        .game-data-section {
+            background-color: var(--darker);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-color);
+            font-size: 0.7rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+        }
+        
+        .light-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.6rem;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .search-box {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 35px;
+            border-radius: 4px;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+        }
+        
+        .light-mode .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            transition: var(--transition);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark);
+            border-color: var(--primary);
+        }
+        
+        .light-mode .filter-btn.active {
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100px;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .product-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+            animation: pulse 1.5s infinite;
+        }
+        
+        .light-mode .product-card.selected {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(29, 78, 216, 0.05));
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        
+        .light-mode .product-card.selected {
+            animation: pulseLight 1.5s infinite;
+        }
+        
+        @keyframes pulseLight {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark);
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            display: inline-block;
+            margin: 8px 0;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        
+        .light-mode .btn {
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .light-mode .btn-outline {
+            color: #000000; /* Warna hitam untuk mode terang */
+        }
+        
+        .btn-outline:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark);
+        }
+        
+        .light-mode .btn-outline:hover {
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        /* Order Summary */
+        .order-summary {
+            background-color: var(--darker);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 3px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .summary-item:last-child {
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+        
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 30px 15px;
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 3px solid var(--success);
+            box-shadow: var(--shadow);
+            animation: slideIn 0.5s ease;
+        }
+        
+        .whatsapp-instruction {
+            background: rgba(37, 211, 102, 0.1);
+            border: 3px solid #25D366;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .whatsapp-instruction h3 {
+            color: #25D366;
+        }
+        
+        .whatsapp-instruction p, .whatsapp-instruction ol {
+            color: var(--text-color);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--darker);
+            padding: 20px 15px;
+            text-align: center;
+            margin-top: auto;
+            border-top: 3px solid var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-content {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+        
+        .footer-link:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+        
+        .social-link {
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+        }
+        
+        .social-link:hover {
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            font-size: 0.6rem;
+            color: var(--text-color);
+            margin-top: 15px;
+        }
+        
+        /* About Page */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        
+        .feature-title {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        .feature-desc {
+            font-size: 0.6rem;
+            color: var(--text-color);
+        }
+        
+        .faq-item {
+            margin-bottom: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background-color: var(--card-bg);
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            color: var(--text-color);
+        }
+        
+        .faq-question:hover {
+            background-color: var(--darker);
+        }
+        
+        .faq-answer {
+            padding: 0 12px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background-color: var(--darker);
+            font-size: 0.6rem;
+            color: var(--text-color);
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 12px;
+        }
+        
+        .faq-item.active .faq-toggle i {
+            transform: rotate(180deg);
+        }
+        
+        .faq-toggle {
+            transition: var(--transition);
+            color: var(--text-color);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+        
+        .mobile-nav {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 999;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mobile-nav.active {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .mobile-nav .nav-item {
+            padding: 10px 12px;
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            text-align: center;
+            color: var(--text-color);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .game-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-card {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .logo-text {
+                font-size: 1rem;
+            }
+            
+            .container {
+                margin-top: 60px;
+                padding: 10px;
+            }
+            
+            .page-content {
+                padding: 15px;
+            }
+            
+            .feature-card {
+                min-height: auto;
+            }
+            
+            .header-controls {
+                order: 3;
+            }
+            
+            .logo-container {
+                order: 1;
+            }
+            
+            .mobile-menu-btn {
+                order: 2;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo img {
+                height: 35px;
+            }
+            
+            .logo-text {
+                font-size: 0.9rem;
+            }
+            
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            
+            h1 {
+                font-size: 1rem;
+            }
+            
+            .game-card {
+                padding: 15px;
+                min-height: 140px;
+            }
+            
+            .game-logo {
+                height: 40px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.7rem;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .logo-text {
+                font-size: 0.8rem;
+            }
+            
+            .game-card {
+                min-height: 120px;
+            }
+            
+            .game-logo {
+                height: 35px;
+            }
+            
+            .game-title {
+                font-size: 0.7rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Background Elements -->
+    <div class="background-container">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        
+        <div class="rainbow">
+            <div class="rainbow-color rainbow-1"></div>
+            <div class="rainbow-color rainbow-2"></div>
+            <div class="rainbow-color rainbow-3"></div>
+            <div class="rainbow-color rainbow-4"></div>
+            <div class="rainbow-color rainbow-5"></div>
+            <div class="rainbow-color rainbow-6"></div>
+            <div class="rainbow-color rainbow-7"></div>
+        </div>
+        <!-- Stars will be added dynamically -->
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+    </div>
+
     <!-- Alert Modal -->
     <div class="alert-modal" id="alertModal">
         <div class="alert-content">
@@ -21,64 +1400,88 @@
         </div>
     </div>
 
-    <!-- Background Elements -->
-    <div class="bg-elements" id="bgElements">
-        <!-- Background elements will be generated by JavaScript -->
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="success-title" id="successTitle">BERHASIL</h3>
+            <p class="success-message" id="successMessage">Order berhasil dikirim ke WhatsApp admin.</p>
+            <button class="success-button" onclick="closeSuccess()">OK</button>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-content">
+            <div class="info-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h3 class="info-title" id="infoTitle">INFO</h3>
+            <p class="info-message" id="infoMessage"></p>
+            <button class="info-button" onclick="closeInfo()">MENGERTI</button>
+        </div>
     </div>
 
     <!-- Header -->
     <header>
         <div class="logo-container">
-            <div class="logo">
-                <img src="https://lh3.googleusercontent.com/pw/AP1GczP-3hxnhODRkjGK8ueVBeTF0bJ0r6J0xLCJj4GIviHWUPzKYLBt9WgsPY9tHgA1pbAHTTbkTa8XVPJX0BxutcajWn7CP2_rs9GGio_OGi6l75BFHj7AK0VPvvZ7GdPXfJgEfH3dB8JrhY53Qjivwjzr=w1280-h1280-s-no-gm" alt="CullStore Logo">
+            <a href="#" class="logo" onclick="navigateTo(1); return false;">
+                <img src="https://lh3.googleusercontent.com/pw/AP1GczNI9hpijhgToRe6VjdqKV6s6ufs4gPMpdQbAHFnjaTsnA_9FkJavWaS1wyd7n2B6si6bm_8QWaKkuF5Pp8MljTXfJj28NYfliawoRFj4g2yCKb7tby-tUVweHjC_F72aUmPtLW4Hx5wdzwCivJZfZ2C=w1280-h1280-s-no-gm?authuser=0" alt="CullStore Logo">
                 <div class="logo-text">CullStore</div>
-            </div>
+            </a>
         </div>
         
         <div class="header-controls">
             <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
-            <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
         
-        <nav class="mobile-menu" id="mobileMenu">
-            <a href="#" onclick="navigateTo(1); toggleMenu();">
-                <i class="fas fa-home"></i> Beranda
-            </a>
-            <a href="#" onclick="navigateTo(2); toggleMenu();">
-                <i class="fas fa-gem"></i> Produk
-            </a>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item" onclick="navigateTo(1); return false;">Beranda</a>
+            <a href="#" class="nav-item" onclick="navigateTo(4); return false;">Tentang Kami</a>
+            <a href="#" class="nav-item" onclick="navigateTo(5); return false;">FAQ</a>
         </nav>
     </header>
 
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#" class="nav-item" onclick="navigateTo(1); toggleMobileMenu(); return false;">Beranda</a>
+        <a href="#" class="nav-item" onclick="navigateTo(4); toggleMobileMenu(); return false;">Tentang Kami</a>
+        <a href="#" class="nav-item" onclick="navigateTo(5); toggleMobileMenu(); return false;">FAQ</a>
+    </div>
 
     <div class="container">
         <!-- Page 1: Welcome -->
         <section id="page1" class="page active">
-            <div class="page-content pixel-box">
+            <div class="page-content">
                 <h1>SELAMAT DATANG DI CULLSTORE</h1>
                 <div class="welcome-content">
-                    <p>Top up <span class="highlight">Diamond Game</span> dengan harga termurah dan proses instan hanya dalam 1 menit!</p>
+                    <p style="text-align: center;">Top up <span style="color: var(--primary); font-weight: bold;">Diamond Game</span> dengan harga termurah dan proses instan hanya dalam 1 menit!</p>
                     
                     <div class="game-selection">
-                        <div class="game-card pixel-box" onclick="selectGame('freefire')">
+                        <div class="game-card" onclick="selectGame('freefire')">
                             <img src="https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2019%2F01%2F5c46e8d4bffce.png&w=384&h=384&q=100" alt="Free Fire" class="game-logo">
                             <div class="game-title">Free Fire</div>
                             <div class="game-desc">Top Up Diamond</div>
                         </div>
                         
-                        <div class="game-card pixel-box" onclick="selectGame('mobilelegends')">
+                        <div class="game-card" onclick="selectGame('mobilelegends')">
                             <img src="https://img.utdstc.com/icon/78d/66f/78d66ff1ab1bd23f7fd6d9cdb93854881cb8f0b69e8a301faaf4f4eab058d19e:200" alt="Mobile Legends" class="game-logo">
                             <div class="game-title">Mobile Legends</div>
                             <div class="game-desc">Top Up Diamond</div>
                         </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="showInfo('Cara Order', '1. Pilih game yang ingin di-top up<br>2. Isi ID game dan nickname<br>3. Pilih jumlah diamond<br>4. Konfirmasi order dan kirim via WhatsApp<br>5. Lakukan pembayaran dan diamond akan diproses dalam 1-5 menit')">
+                            <i class="fas fa-info-circle"></i> Cara Order
+                        </button>
                     </div>
                 </div>
             </div>
@@ -86,19 +1489,27 @@
 
         <!-- Page 2: Products -->
         <section id="page2" class="page">
-            <div class="page-content pixel-box">
+            <div class="page-content">
                 <h1>TOP UP DIAMOND</h1>
                 
-                <div class="game-header" id="gameHeader">
+                <div class="game-header" id="gameHeader" style="text-align: center; margin-bottom: 15px;">
                     <!-- Game header will be loaded dynamically -->
                 </div>
                 
-                <div class="game-data-section pixel-box">
+                <div class="game-data-section">
                     <div class="form-group">
                         <label for="playerId"><i class="fas fa-id-card"></i> ID Game</label>
-                        <input type="text" id="playerId" class="form-control" placeholder="Contoh: 123456789" required>
+                        <input type="text" id="playerId" class="form-control" placeholder=": 123456789" required>
                         <small class="error-message" id="playerIdError">
                             <i class="fas fa-exclamation-circle"></i> Harap isi ID Game Anda
+                        </small>
+                    </div>
+                    
+                    <div class="form-group" id="serverGroup" style="display: none;">
+                        <label for="server"><i class="fas fa-server"></i> Server</label>
+                        <input type="text" id="server" class="form-control" placeholder="Contoh: 12345" required>
+                        <small class="error-message" id="serverError">
+                            <i class="fas fa-exclamation-circle"></i> Harap isi server Anda
                         </small>
                     </div>
                     
@@ -111,20 +1522,34 @@
                     </div>
                 </div>
                 
-                <div class="section-title">PILIH JUMLAH DIAMOND</div>
-                <small class="error-message" id="productError" style="text-align: center; margin-bottom: 10px; display: none;">
+                <div style="color: var(--primary); margin: 15px 0 12px; font-size: 0.9rem; text-align: center; padding: 6px; background: rgba(255, 215, 0, 0.1); border-radius: 4px; border: 2px solid var(--primary);">
+                    <i class="fas fa-gem"></i> PILIH JUMLAH DIAMOND
+                </div>
+                
+                <small class="error-message" id="productError" style="text-align: center; margin-bottom: 8px; display: none;">
                     <i class="fas fa-exclamation-circle"></i> Harap pilih jumlah diamond
                 </small>
+                
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="productSearch" class="search-input" placeholder="Cari diamond..." oninput="filterProducts()">
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="changeFilter('all')">Semua</button>
+                    <button class="filter-btn" onclick="changeFilter('cheap')">Termurah</button>
+                    <button class="filter-btn" onclick="changeFilter('large')">Jumlah Besar</button>
+                </div>
                 
                 <div class="products-grid" id="productsGrid">
                     <!-- Products will be loaded dynamically -->
                 </div>
                 
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline" onclick="navigateTo(1)" style="width: 30%;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="navigateTo(1)" style="flex: 1; min-width: 100px;">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </button>
-                    <button class="btn" onclick="validateAndProceed()" id="proceedBtn" disabled style="width: 70%;">
+                    <button class="btn" onclick="validateAndProceed()" id="proceedBtn" style="flex: 2; min-width: 150px;">
                         <i class="fas fa-arrow-right"></i> Lanjut ke Konfirmasi
                     </button>
                 </div>
@@ -133,10 +1558,10 @@
 
         <!-- Page 3: Confirmation -->
         <section id="page3" class="page">
-            <div class="page-content pixel-box">
+            <div class="page-content">
                 <h1>KONFIRMASI ORDER</h1>
                 
-                <div class="order-summary pixel-box">
+                <div class="order-summary">
                     <h2>Ringkasan Pesanan</h2>
                     <div class="summary-item">
                         <span>Game:</span>
@@ -153,6 +1578,10 @@
                     <div class="summary-item">
                         <span>ID Game:</span>
                         <span id="summaryId">-</span>
+                    </div>
+                    <div class="summary-item" id="summaryServerItem" style="display: none;">
+                        <span>Server:</span>
+                        <span id="summaryServer">-</span>
                     </div>
                     <div class="summary-item">
                         <span>Nickname:</span>
@@ -175,18 +1604,136 @@
                     </ol>
                 </div>
                 
-                <button class="btn btn-whatsapp" onclick="sendOrderToWhatsApp()" id="whatsappBtn">
-                    <i class="fab fa-whatsapp"></i> Order via WhatsApp
-                </button>
-                <button class="btn btn-outline" onclick="navigateTo(2)">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="navigateTo(2)" style="flex: 1; min-width: 100px;">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <button class="btn" onclick="sendOrderToWhatsApp()" id="whatsappBtn" style="flex: 2; min-width: 150px; background: linear-gradient(135deg, #25D366, #128C7E); color: white;">
+                        <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 4: About -->
+        <section id="page4" class="page">
+            <div class="page-content">
+                <h1>TENTANG CULLSTORE</h1>
+                
+                <p style="text-align: center;">CullStore adalah platform top up game terpercaya yang menyediakan layanan pengisian diamond untuk berbagai game populer dengan proses cepat dan harga terjangkau.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="feature-title">PROSES CEPAT</h3>
+                        <p class="feature-desc">Diamond akan diproses dalam 1-5 menit setelah pembayaran dikonfirmasi</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 class="feature-title">AMAN DAN TERPERCAYA</h3>
+                        <p class="feature-desc">Transaksi aman dengan sistem yang terjamin keamanannya</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <h3 class="feature-title">HARGA TERJANGKAU</h3>
+                        <p class="feature-desc">Harga diamond kompetitif dengan berbagai pilihan paket</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3 class="feature-title">BANTUAN 24/7</h3>
+                        <p class="feature-desc">Customer service siap membantu Anda kapan saja</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="navigateTo(1)">
+                        <i class="fas fa-gamepad"></i> Mulai Top Up Sekarang
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 5: FAQ -->
+        <section id="page5" class="page">
+            <div class="page-content">
+                <h1>PERTANYAAN UMUM</h1>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this.parentNode)">
+                        <span>Bagaimana cara melakukan top up?</span>
+                        <span class="faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>1. Pilih game yang ingin di-top up<br>
+                        2. Isi ID game dan nickname<br>
+                        3. Pilih jumlah diamond<br>
+                        4. Konfirmasi order dan kirim via WhatsApp<br>
+                        5. Lakukan pembayaran dan diamond akan diproses dalam 1-5 menit</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this.parentNode)">
+                        <span>Berapa lama proses pengiriman diamond?</span>
+                        <span class="faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Diamond akan diproses dalam 1-5 menit setelah pembayaran dikonfirmasi oleh admin.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this.parentNode)">
+                        <span>Metode pembayaran apa saja yang diterima?</span>
+                        <span class="faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Kami menerima transfer e-wallet (Gopay, Dana), dan QRIS.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this.parentNode)">
+                        <span>Bagaimana jika diamond tidak masuk?</span>
+                        <span class="faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Pastikan ID game dan nickname sudah benar. Jika diamond tidak masuk dalam 10 menit, segera hubungi customer service kami via WhatsApp dengan menyertakan bukti pembayaran.</p>
+                    </div>
+                </div>
+
+               <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this.parentNode)">
+                        <span>Apakah ada garansi untuk transaksi?</span>
+                        <span class="faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Ya, kami memberikan garansi untuk semua transaksi. Jika terjadi masalah, kami akan mengembalikan dana atau mengirimkan diamond sesuai pesanan.</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="showInfo('Butuh Bantuan?', 'Hubungi customer service kami via WhatsApp di 0838-4302-8605 untuk bantuan lebih lanjut. Kami siap membantu 24/7!')">
+                        <i class="fas fa-headset"></i> Butuh Bantuan Lainnya?
+                    </button>
+                </div>
             </div>
         </section>
 
         <!-- Success Message -->
-        <div class="page-content success-message" id="successMessage">
-            <i class="fas fa-check-circle"></i>
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
             <h2>ORDER BERHASIL DIKIRIM!</h2>
             <p>Terima kasih telah melakukan order. Admin akan segera menghubungi Anda via WhatsApp untuk proses pembayaran.</p>
             <p>Diamond akan diproses dalam 1-5 menit setelah pembayaran dikonfirmasi.</p>
@@ -196,17 +1743,484 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p class="footer-text">&copy; 2023 CullStore - Top Up Game Resmi</p>
-            <a href="https://wa.me/6283843028605" class="whatsapp-contact" target="_blank">
-                <i class="fab fa-whatsapp"></i>
-                <span>Hubungi Customer Service</span>
-            </a>
+            <div class="footer-links">
+                <a href="#" class="footer-link" onclick="navigateTo(1); return false;">Beranda</a>
+                <a href="#" class="footer-link" onclick="navigateTo(4); return false;">Tentang Kami</a>
+                <a href="#" class="footer-link" onclick="navigateTo(5); return false;">FAQ</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="social-link" onclick="showInfo('Facebook', 'Follow kami di Facebook: CullStore Official'); return false;">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" onclick="showInfo('Instagram', 'Follow kami di Instagram: @cullstore'); return false;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" onclick="showInfo('WhatsApp', 'Hubungi kami di WhatsApp: 0838-4302-8605'); return false;">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2023 CullStore - Top Up Game. All rights reserved.
+            </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // App Data
+        const products = {
+            freefire: [
+                { id: 1, name: "5 Diamond", price: 1500 },
+                { id: 2, name: "12 Diamond", price: 2500 },
+                { id: 3, name: "20 Diamond", price: 4000 },
+                { id: 4, name: "50 Diamond", price: 8000 },
+                { id: 5, name: "70 Diamond", price: 10000 },
+                { id: 6, name: "100 Diamond", price: 14500 },
+                { id: 7, name: "140 Diamond", price: 20000 },
+                { id: 8, name: "210 Diamond", price: 28000 },
+                { id: 9, name: "355 Diamond", price: 48000 },
+                { id: 10, name: "500 Diamond", price: 65000 },
+                { id: 11, name: "720 Diamond", price: 91000 },
+                { id: 12, name: "1000 Diamond", price: 126000 }
+            ],
+            mobilelegends: [
+                { id: 1, name: "5 Diamond", price: 1000 },
+                { id: 2, name: "12 Diamond", price: 2500 },
+                { id: 3, name: "20 Diamond", price: 4000 },
+                { id: 4, name: "50 Diamond", price: 8000 },
+                { id: 5, name: "70 Diamond", price: 10000 },
+                { id: 6, name: "100 Diamond", price: 14500 },
+                { id: 7, name: "140 Diamond", price: 20000 },
+                { id: 8, name: "210 Diamond", price: 28000 },
+                { id: 9, name: "355 Diamond", price: 48000 },
+                { id: 10, name: "500 Diamond", price: 65000 },
+                { id: 11, name: "720 Diamond", price: 91000 },
+                { id: 12, name: "1000 Diamond", price: 126000 }
+            ]
+        };
+
+        const gameLogos = {
+            freefire: "https://www.apkmirror.com/wp-content/themes/APKMirror/ap_resize/ap_resize.php?src=https%3A%2F%2Fdownloadr2.apkmirror.com%2Fwp-content%2Fuploads%2F2019%2F01%2F5c46e8d4bffce.png&w=384&h=384&q=100",
+            mobilelegends: "https://img.utdstc.com/icon/78d/66f/78d66ff1ab1bd23f7fd6d9cdb93854881cb8f0b69e8a301faaf4f4eab058d19e:200"
+        };
+
+        const gameNames = {
+            freefire: "Free Fire",
+            mobilelegends: "Mobile Legends"
+        };
+
+        // App State
+        let selectedProduct = null;
+        let selectedGame = null;
+        let currentFilter = 'all';
+        let orderData = {
+            game: null,
+            product: null,
+            playerId: "",
+            server: "",
+            nickname: ""
+        };
+
+        // DOM Elements
+        const playerIdInput = document.getElementById('playerId');
+        const serverInput = document.getElementById('server');
+        const serverGroup = document.getElementById('serverGroup');
+        const nicknameInput = document.getElementById('nickname');
+        const gameHeader = document.getElementById('gameHeader');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const playerIdError = document.getElementById('playerIdError');
+        const serverError = document.getElementById('serverError');
+        const nicknameError = document.getElementById('nicknameError');
+        const productError = document.getElementById('productError');
+        const alertModal = document.getElementById('alertModal');
+        const successModal = document.getElementById('successModal');
+        const infoModal = document.getElementById('infoModal');
+        const alertTitle = document.getElementById('alertTitle');
+        const alertMessage = document.getElementById('alertMessage');
+        const successTitle = document.getElementById('successTitle');
+        const successMessageEl = document.getElementById('successMessageEl');
+        const infoTitle = document.getElementById('infoTitle');
+        const infoMessage = document.getElementById('infoMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const mobileNav = document.getElementById('mobileNav');
+        const summaryServerItem = document.getElementById('summaryServerItem');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create background elements
+            createBackgroundElements();
+            
+            // Simulate loading
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 1500);
+            
+            // Hide error messages initially
+            playerIdError.style.display = 'none';
+            serverError.style.display = 'none';
+            nicknameError.style.display = 'none';
+            productError.style.display = 'none';
+            
+            // Check saved theme
+            checkSavedTheme();
+        });
+
+        // Create background elements
+        function createBackgroundElements() {
+            const container = document.querySelector('.background-container');
+            
+            // Create stars for dark mode
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 2 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.top = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+            
+            // Create shooting stars for dark mode
+            for (let i = 0; i < 3; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.top = Math.random() * 50 + '%';
+                shootingStar.style.right = Math.random() * 20 + '%';
+                shootingStar.style.animationDelay = Math.random() * 10 + 's';
+                container.appendChild(shootingStar);
+            }
+        }
+
+        // Show alert modal
+        function showAlert(title, message) {
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            alertModal.classList.add('active');
+        }
+
+        // Close alert modal
+        function closeAlert() {
+            alertModal.classList.remove('active');
+        }
+
+        // Show success modal
+        function showSuccess(title, message) {
+            successTitle.textContent = title;
+            successMessageEl.textContent = message;
+            successModal.classList.add('active');
+        }
+
+        // Close success modal
+        function closeSuccess() {
+            successModal.classList.remove('active');
+        }
+
+        // Show info modal
+        function showInfo(title, message) {
+            infoTitle.textContent = title;
+            infoMessage.innerHTML = message;
+            infoModal.classList.add('active');
+        }
+
+        // Close info modal
+        function closeInfo() {
+            infoModal.classList.remove('active');
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            mobileNav.classList.toggle('active');
+        }
+
+        // Select game
+        function selectGame(game) {
+            selectedGame = game;
+            orderData.game = game;
+            
+            // Load products for selected game
+            loadProducts(game);
+            
+            // Show/hide server field based on game
+            if (game === 'mobilelegends') {
+                serverGroup.style.display = 'block';
+                serverInput.setAttribute('required', 'required');
+            } else {
+                serverGroup.style.display = 'none';
+                serverInput.removeAttribute('required');
+            }
+            
+            // Navigate to products page
+            navigateTo(2);
+        }
+
+        // Load products into the grid
+        function loadProducts(game) {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+            
+            // Set game header
+            gameHeader.innerHTML = `
+                <img src="${gameLogos[game]}" alt="${gameNames[game]}" style="height: 45px; border: 2px solid var(--primary); border-radius: 4px; padding: 4px;">
+                <div style="font-size: 1rem; margin-top: 8px;">${gameNames[game]}</div>
+            `;
+            
+            let productsToShow = products[game];
+            
+            // Apply filters
+            if (currentFilter === 'cheap') {
+                productsToShow = [...productsToShow].sort((a, b) => a.price - b.price);
+            } else if (currentFilter === 'large') {
+                productsToShow = [...productsToShow].sort((a, b) => b.price - a.price);
+            }
+            
+            productsToShow.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.dataset.id = product.id;
+                productCard.innerHTML = `
+                    <i class="fas fa-gem" style="font-size: 1.5rem; margin: 4px 0; color: var(--diamond-blue);"></i>
+                    <div style="font-weight: bold; margin-bottom: 4px; font-size: 0.7rem;">${product.name}</div>
+                    <div style="color: var(--primary); font-weight: bold; font-size: 0.7rem;">Rp ${product.price.toLocaleString('id-ID')}</div>
+                `;
+                
+                productCard.addEventListener('click', () => selectProduct(product));
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Change filter
+        function changeFilter(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload products
+            loadProducts(selectedGame);
+        }
+
+        // Filter products based on search input
+        function filterProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                const productName = card.querySelector('div:nth-child(2)').textContent.toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Select a product
+        function selectProduct(product) {
+            // Deselect all products
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select the clicked product
+            const selectedCard = document.querySelector(`.product-card[data-id="${product.id}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
+            selectedProduct = product;
+            orderData.product = product;
+            productError.style.display = 'none';
+        }
+
+        // Validate and proceed to confirmation
+        function validateAndProceed() {
+            const playerId = playerIdInput.value.trim();
+            const server = serverInput.value.trim();
+            const nickname = nicknameInput.value.trim();
+            let isValid = true;
+            let errorMessage = "";
+            
+            // Reset error messages
+            playerIdError.style.display = 'none';
+            serverError.style.display = 'none';
+            nicknameError.style.display = 'none';
+            productError.style.display = 'none';
+            
+            // Validate player ID
+            if (!playerId) {
+                playerIdError.style.display = 'block';
+                isValid = false;
+                errorMessage += "• Harap isi ID Game Anda\n";
+            }
+            
+            // Validate server (only for Mobile Legends)
+            if (selectedGame === 'mobilelegends' && !server) {
+                serverError.style.display = 'block';
+                isValid = false;
+                errorMessage += "• Harap isi server Anda\n";
+            }
+            
+            // Validate nickname
+            if (!nickname) {
+                nicknameError.style.display = 'block';
+                isValid = false;
+                errorMessage += "• Harap isi Nickname Anda\n";
+            }
+            
+            // Validate product selection
+            if (!selectedProduct) {
+                productError.style.display = 'block';
+                isValid = false;
+                errorMessage += "• Harap pilih jumlah diamond\n";
+            }
+            
+            if (!isValid) {
+                // Show alert modal with error details
+                showAlert("DATA BELUM LENGKAP", "Silakan lengkapi data berikut sebelum melanjutkan:\n" + errorMessage);
+                return;
+            }
+            
+            // If all data is valid, proceed to confirmation
+            orderData = {
+                ...orderData,
+                playerId,
+                server,
+                nickname
+            };
+            
+            navigateTo(3);
+            updateOrderSummary();
+        }
+
+        // Update order summary
+        function updateOrderSummary() {
+            if (!orderData.product || !orderData.game) return;
+            
+            document.getElementById('summaryGame').textContent = gameNames[orderData.game];
+            document.getElementById('summaryProduct').textContent = orderData.product.name;
+            document.getElementById('summaryPrice').textContent = `Rp ${orderData.product.price.toLocaleString('id-ID')}`;
+            document.getElementById('summaryId').textContent = orderData.playerId;
+            document.getElementById('summaryNickname').textContent = orderData.nickname;
+            document.getElementById('summaryTotal').textContent = `Rp ${orderData.product.price.toLocaleString('id-ID')}`;
+            
+            // Show/hide server info based on game
+            if (orderData.game === 'mobilelegends' && orderData.server) {
+                document.getElementById('summaryServer').textContent = orderData.server;
+                summaryServerItem.style.display = 'flex';
+            } else {
+                summaryServerItem.style.display = 'none';
+            }
+        }
+
+        // Send order to WhatsApp
+        function sendOrderToWhatsApp() {
+            if (!orderData.product || !orderData.playerId || !orderData.nickname || !orderData.game) {
+                showAlert("ERROR", "Terjadi kesalahan data. Silakan ulangi proses order.");
+                return;
+            }
+            
+            // Format WhatsApp message
+            let message = `
+🛒 *ORDER DIAMOND ${gameNames[orderData.game].toUpperCase()}* 🛒
+
+📋 *DATA PEMESANAN:*
+• Game: ${gameNames[orderData.game]}
+• ID Game: ${orderData.playerId}
+`;
+            
+            // Add server info only for Mobile Legends
+            if (orderData.game === 'mobilelegends' && orderData.server) {
+                message += `• Server: ${orderData.server}\n`;
+            }
+            
+            message += `• Nickname: ${orderData.nickname}
+
+💎 *DETAIL ORDER:*
+• Paket Diamond: ${orderData.product.name}
+• Harga: Rp ${orderData.product.price.toLocaleString('id-ID')}
+
+💰 *TOTAL: Rp ${orderData.product.price.toLocaleString('id-ID')}*
+⏰ *Waktu Order:* ${new Date().toLocaleString('id-ID')}
+
+📞 *Silakan konfirmasi ketersediaan dan instruksi pembayaran*
+
+_Order ini dikirim otomatis dari website CullStore_
+            `.trim().replace(/^ +/gm, '');
+            
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/6283843028605?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+            
+            // Show success message
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            successMessage.style.display = 'block';
+        }
+
+        // Navigate between pages
+        function navigateTo(pageNumber) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Hide mobile menu if open
+            mobileNav.classList.remove('active');
+            
+            // Hide success message if shown
+            successMessage.style.display = 'none';
+            
+            // Show the selected page
+            document.getElementById(`page${pageNumber}`).classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Toggle FAQ item
+        function toggleFaq(item) {
+            item.classList.toggle('active');
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('cullstore_theme', 'light');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('cullstore_theme', 'dark');
+            }
+        }
+
+        // Check saved theme
+        function checkSavedTheme() {
+            const savedTheme = localStorage.getItem('cullstore_theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+    </script>
 </body>
-  </html>
+    </html>
